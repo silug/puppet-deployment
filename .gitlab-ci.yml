@@ -28,9 +28,14 @@ generate:
     - pipelines
   script:
     - 'export PATH=$PATH:/opt/puppetlabs/puppet/bin'
+    - if type -p bundle >/dev/null 2>&1 ; then
     - 'rm -f Gemfile.lock || :'
     - bundle install --without syntax --path vendor/bundle --jobs $(nproc)
     - bundle exec generate-deploy > .gitlab-ci-dynamic.yml
+    - else
+    - echo 'bundle not found in PATH.  Continuing without it.'
+    - ./generate-deploy > .gitlab-ci-dynamic.yml
+    - fi
   artifacts:
     paths:
       - .gitlab-ci-dynamic.yml
