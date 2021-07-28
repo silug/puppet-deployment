@@ -53,3 +53,7 @@ deploy_all:
       - artifact: .gitlab-ci-dynamic.yml
         job: generate
     strategy: depend
+  variables:
+    PUPPET_DEPLOYMENT_TYPE: $PUPPET_DEPLOYMENT_TYPE
+    PUPPET_ENVIRONMENT: $PUPPET_ENVIRONMENT
+    PUPPET_MODULE: $PUPPET_MODULE
