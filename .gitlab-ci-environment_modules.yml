@@ -1,0 +1,11 @@
+---
+.deploy_environment_modules:
+  stage: deploy
+  only:
+    refs:
+      - branches
+  before_script: []
+  script:
+    - 'sudo r10k deploy environment "$PUPPET_ENVIRONMENT" -pv'
+  variables:
+    GIT_STRATEGY: none

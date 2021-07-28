@@ -1,0 +1,86 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'json'
+require 'yaml'
+require 'httpclient'
+
+def usage
+  warn <<~END_USAGE
+
+    Usage: #{File.basename($PROGRAM_NAME)}
+
+    Required environment variables:
+
+      GITLAB_API_TOKEN        User API token with read_api permissions
+      PUPPET_DEPLOYMENT_TYPE  Type of Puppet deployment (environment, module)
+      PUPPET_ENVIRONMENT      Puppet environment to deploy
+      PUPPET_MODULE           Puppet module to deploy (if PUPPET_DEPLOYMENT_TYPE == module)
+  END_USAGE
+end
+
+def abort_with_usage(message)
+  warn message
+  usage
+  exit 1
+end
+
+def token
+  ENV['GITLAB_API_TOKEN'] || abort_with_usage('No GitLab token defined')
+end
+
+def deployment_type
+  ENV['PUPPET_DEPLOYMENT_TYPE'] || abort_with_usage('Unknown Puppet deployment type')
+end
+
+def environment
+  ENV['PUPPET_ENVIRONMENT'] || abort_with_usage('Unknown Puppet environment')
+end
+
+def runner_tags
+  return @tags unless @tags.nil?
+
+  ['CI_RUNNER_TAGS', 'CI_RUNNER_DESCRIPTION'].each do |key|
+    abort_with_usage("Missing GitLab CI environment #{key}") unless ENV.key?(key)
+  end
+
+  @tags = ENV['CI_RUNNER_TAGS'].split(%r{\s*,\s*}).reject { |tag| tag == ENV['CI_RUNNER_DESCRIPTION'] }
+end
+
+def url
+  "#{ENV['CI_API_V4_URL']}/runners"
+end
+
+def runners_with_tag(tag)
+  @client ||= HTTPClient.new { ssl_config.cert_store.set_default_paths }
+
+  query = {
+    'status'   => 'active',
+    'tag_list' => tag,
+  }
+
+  headers = { 'Private-Token' => token }
+
+  response = @client.get(url, query, headers)
+
+  runner_list = JSON.parse(response.body)
+  raise "Error: #{response.body}" unless HTTP::Status.successful?(response.status)
+
+  raise "Error: Expected an Array, got a #{runner_list.class}" unless runner_list.is_a?(Array)
+  raise 'Error: API returned an empty list of runners' if runner_list.empty?
+  runner_list.map { |runner| runner['description'].to_s }
+end
+
+out = YAML.load_file(".gitlab-ci-#{deployment_type}.yml")
+jobs = out.keys
+
+runners_with_tag(runner_tags[0]).each do |runner|
+  jobs.each do |job|
+    out["#{job.delete_prefix('.')}:#{runner}"] = {
+      'extends' => job,
+      'tags'    => [runner],
+    }
+  end
+end
+
+puts out.to_yaml

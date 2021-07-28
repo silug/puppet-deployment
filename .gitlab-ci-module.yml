@@ -1,0 +1,17 @@
+---
+.deploy_module:
+  stage: deploy
+  only:
+    refs:
+      - branches
+  before_script: []
+  script:
+    - if [ -d /etc/puppetlabs/code/environments/"$PUPPET_ENVIRONMENT" ] ; then
+    - echo "Deploying $PUPPET_MODULE in environment $PUPPET_ENVIRONMENT..."
+    - sudo r10k deploy module "$PUPPET_MODULE" -e "$PUPPET_ENVIRONMENT" -v
+    - else
+    - echo "Skipping deployment of $PUPPET_MODULE in environment $PUPPET_ENVIRONMENT."
+    - echo "No matching environment."
+    - fi
+  variables:
+    GIT_STRATEGY: none

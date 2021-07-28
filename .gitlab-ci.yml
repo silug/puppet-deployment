@@ -1,0 +1,48 @@
+---
+stages:
+  - syntax
+  - generate
+  - deploy
+
+default:
+  cache:
+    paths:
+      - vendor/bundle
+
+rubocop:
+  stage: syntax
+  image: ruby:2.7.3
+  except:
+    - pipelines
+  script:
+    - 'rm -f Gemfile.lock || :'
+    - bundle install --with syntax --path vendor/bundle --jobs $(nproc)
+    - bundle exec rubocop
+
+# Derived from https://gitlab.com/gitlab-org/gitlab/-/issues/16474#note_588203659
+generate:
+  stage: generate
+  only:
+    - pipelines
+  script:
+    - 'export PATH=$PATH:/opt/puppetlabs/puppet/bin'
+    - 'rm -f Gemfile.lock || :'
+    - bundle install --without syntax --path vendor/bundle --jobs $(nproc)
+    - bundle exec generate-deploy > .gitlab-ci-dynamic.yml
+  artifacts:
+    paths:
+      - .gitlab-ci-dynamic.yml
+  tags:
+    - r10k
+
+deploy_all:
+  stage: deploy
+  only:
+    - pipelines
+  needs:
+    - generate
+  trigger:
+    include:
+      - artifact: .gitlab-ci-dynamic.yml
+        job: generate
+    strategy: depend
