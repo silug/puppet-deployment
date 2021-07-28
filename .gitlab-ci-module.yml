@@ -6,20 +6,24 @@
       - branches
   before_script: []
   script:
-    - if [ -z "$PUPPET_ENVIRONMENT" ] ; then
-    - echo 'PUPPET_ENVIRONMENT not set' >&2
-    - exit 1
-    - fi
-    - if [ -z "$PUPPET_MODULE" ] ; then
-    - echo 'PUPPET_MODULE not set' >&2
-    - exit 1
-    - fi
-    - if [ -d /etc/puppetlabs/code/environments/"$PUPPET_ENVIRONMENT" ] ; then
-    - echo "Deploying $PUPPET_MODULE in environment $PUPPET_ENVIRONMENT..."
-    - sudo r10k deploy module "$PUPPET_MODULE" -e "$PUPPET_ENVIRONMENT" -v
-    - else
-    - echo "Skipping deployment of $PUPPET_MODULE in environment $PUPPET_ENVIRONMENT."
-    - echo "No matching environment."
-    - fi
+    - |
+      if [ -z "$PUPPET_ENVIRONMENT" ] ; then
+          echo 'PUPPET_ENVIRONMENT not set' >&2
+          exit 1
+      fi
+      if [ -z "$PUPPET_MODULE" ] ; then
+          echo 'PUPPET_MODULE not set' >&2
+          exit 1
+      fi
+      if [ "$PUPPET_ENVIRONMENT" = "$DEFAULT_BRANCH" ] ; then
+          echo "Deploying $PUPPET_MODULE..."
+          sudo r10k deploy module "$PUPPET_MODULE" -v
+      elif [ -d /etc/puppetlabs/code/environments/"$PUPPET_ENVIRONMENT" ] ; then
+          echo "Deploying $PUPPET_MODULE in environment $PUPPET_ENVIRONMENT..."
+          sudo r10k deploy module "$PUPPET_MODULE" -e "$PUPPET_ENVIRONMENT" -v
+      else
+          echo "Skipping deployment of $PUPPET_MODULE in environment $PUPPET_ENVIRONMENT."
+          echo "No matching environment."
+      fi
   variables:
     GIT_STRATEGY: none
