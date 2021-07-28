@@ -18,6 +18,8 @@ rubocop:
     - 'rm -f Gemfile.lock || :'
     - bundle install --with syntax --path vendor/bundle --jobs $(nproc)
     - bundle exec rubocop
+  tags:
+    - docker
 
 # Derived from https://gitlab.com/gitlab-org/gitlab/-/issues/16474#note_588203659
 generate:
