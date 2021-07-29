@@ -125,10 +125,9 @@ deploy_environment_modules:
     PUPPET_DEPLOYMENT_TYPE: environment_modules
     PUPPET_ENVIRONMENT: $CI_COMMIT_BRANCH
   trigger:
+    # Set this to the relative path of this repo in your GitLab.
     project: puppet/puppet-deployment
 ```
-
-Set `project` above to the relative path of this repo in your GitLab.
 
 ## Enabling for a Puppet Module
 
@@ -152,10 +151,9 @@ If you are using PDK, add the following to your `.sync.yml` and run `pdk update`
           PUPPET_MODULE: $CI_PROJECT_NAME
           DEFAULT_BRANCH: $CI_DEFAULT_BRANCH
         trigger:
+          # Set this to the relative path of this repo in your GitLab.
           project: puppet/puppet-deployment
 ```
-
-Set `project` above to the relative path of this repo in your GitLab.
 
 If you are **not** using PDK, you can add the equivalent to your `.gitlab-ci.yml` directly:
 
@@ -174,5 +172,6 @@ deploy:
     PUPPET_MODULE: $CI_PROJECT_NAME
     DEFAULT_BRANCH: $CI_DEFAULT_BRANCH
   trigger:
+    # Set this to the relative path of this repo in your GitLab.
     project: puppet/puppet-deployment
 ```
