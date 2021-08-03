@@ -7,13 +7,13 @@ We can work around this problem by using a script to dynamically generate a list
 The idea for this solution came from [a clever comment on that issue](https://gitlab.com/gitlab-org/gitlab/-/issues/16474#note_588203659).
 
 - [Puppet Deployment for GitLab CI](#puppet-deployment-for-gitlab-ci)
-	- [Getting Started](#getting-started)
-		- [Import this project](#import-this-project)
-		- [Set `GITLAB_API_TOKEN`](#set-gitlab_api_token)
-		- [Installing the runner](#installing-the-runner)
-		- [Prerequisites](#prerequisites)
-	- [Enabling for a Control Repo](#enabling-for-a-control-repo)
-	- [Enabling for a Puppet Module](#enabling-for-a-puppet-module)
+  - [Getting Started](#getting-started)
+    - [Import this project](#import-this-project)
+    - [Set `GITLAB_API_TOKEN`](#set-gitlab_api_token)
+    - [Installing the runner](#installing-the-runner)
+    - [Prerequisites](#prerequisites)
+  - [Enabling for a Control Repo](#enabling-for-a-control-repo)
+  - [Enabling for a Puppet Module](#enabling-for-a-puppet-module)
 
 ## Getting Started
 
@@ -65,7 +65,9 @@ gitlab_ci_runner::runners:
 
 sudo::configs:
   'gitlab-runner':
-    content: "gitlab-runner %{facts.hostname} = (root) NOPASSWD: /usr/bin/r10k deploy *"
+    content:
+      - "gitlab-runner %{facts.hostname} = (root) NOPASSWD: /usr/bin/r10k deploy *"
+      - "gitlab-runner %{facts.hostname} = (root) NOPASSWD: /opt/puppetlabs/bin/puppet generate types *"
 ```
 
 ### Prerequisites

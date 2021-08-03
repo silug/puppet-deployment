@@ -7,6 +7,7 @@
   before_script: []
   script:
     - |
+      [ -f /etc/profile.d/puppet-agent.sh ] && . /etc/profile.d/puppet-agent.sh
       if [ -z "$PUPPET_ENVIRONMENT" ] ; then
           echo 'PUPPET_ENVIRONMENT not set' >&2
           exit 1
@@ -18,9 +19,15 @@
       if [ "$PUPPET_ENVIRONMENT" = "$DEFAULT_BRANCH" ] ; then
           echo "Deploying $PUPPET_MODULE..."
           sudo r10k deploy module "$PUPPET_MODULE" -v
+          for environment in /etc/puppetlabs/code/environments/* ; do
+              if [ -f "$environment"/.git -a -f "$environment"/Puppetfile ] ; then
+                  sudo puppet generate types --environment "${environment##*/}"
+              fi
+          done
       elif [ -d /etc/puppetlabs/code/environments/"$PUPPET_ENVIRONMENT" ] ; then
           echo "Deploying $PUPPET_MODULE in environment $PUPPET_ENVIRONMENT..."
           sudo r10k deploy module "$PUPPET_MODULE" -e "$PUPPET_ENVIRONMENT" -v
+          sudo puppet generate types --environment "$PUPPET_ENVIRONMENT"
       else
           echo "Skipping deployment of $PUPPET_MODULE in environment $PUPPET_ENVIRONMENT."
           echo "No matching environment."

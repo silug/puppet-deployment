@@ -6,10 +6,12 @@
       - branches
   before_script: []
   script:
+    - '[ -f /etc/profile.d/puppet-agent.sh ] && . /etc/profile.d/puppet-agent.sh'
     - if [ -z "$PUPPET_ENVIRONMENT" ] ; then
     - echo 'PUPPET_ENVIRONMENT not set' >&2
     - exit 1
     - fi
     - 'sudo r10k deploy environment "$PUPPET_ENVIRONMENT" -pv'
+    - 'sudo puppet generate types --environment "$PUPPET_ENVIRONMENT"'
   variables:
     GIT_STRATEGY: none
