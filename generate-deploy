@@ -42,6 +42,7 @@ def runner_tags
 
   ['CI_RUNNER_TAGS', 'CI_RUNNER_DESCRIPTION'].each do |key|
     abort_with_usage("Missing GitLab CI environment #{key}") unless ENV.key?(key)
+    abort_with_usage("Empty GitLab CI environment #{key}") if ENV[key].empty?
   end
 
   @tags = ENV['CI_RUNNER_TAGS'].split(%r{\s*,\s*}).reject { |tag| tag == ENV['CI_RUNNER_DESCRIPTION'] }
