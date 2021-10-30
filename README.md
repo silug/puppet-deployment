@@ -59,6 +59,7 @@ gitlab_ci_runner::runner_defaults:
 
 gitlab_ci_runner::runners:
   "%{facts.hostname}-r10k":
+    description: "%{facts.hostname}-r10k"
     executor: shell
     shell: bash
     tag-list: "r10k,%{facts.hostname}-r10k"
