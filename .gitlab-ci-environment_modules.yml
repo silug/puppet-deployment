@@ -11,7 +11,7 @@
     - echo 'PUPPET_ENVIRONMENT not set' >&2
     - exit 1
     - fi
-    - 'sudo r10k deploy environment "$PUPPET_ENVIRONMENT" -pv'
-    - 'sudo puppet generate types --environment "$PUPPET_ENVIRONMENT"'
+    - 'sudo /usr/bin/r10k deploy environment "$PUPPET_ENVIRONMENT" -pv'
+    - 'sudo /opt/puppetlabs/bin/puppet generate types --environment "$PUPPET_ENVIRONMENT"'
   variables:
     GIT_STRATEGY: none

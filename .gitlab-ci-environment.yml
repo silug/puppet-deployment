@@ -10,6 +10,6 @@
     - echo 'PUPPET_ENVIRONMENT not set' >&2
     - exit 1
     - fi
-    - 'sudo r10k deploy environment "$PUPPET_ENVIRONMENT" -v'
+    - 'sudo /usr/bin/r10k deploy environment "$PUPPET_ENVIRONMENT" -v'
   variables:
     GIT_STRATEGY: none
