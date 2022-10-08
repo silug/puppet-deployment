@@ -37,6 +37,12 @@ def environment
   ENV['PUPPET_ENVIRONMENT'] || abort_with_usage('Unknown Puppet environment')
 end
 
+def ci_runner_tags
+  JSON.parse(ENV['CI_RUNNER_TAGS'])
+rescue
+  ENV['CI_RUNNER_TAGS'].split(%r{\s*,\s*})
+end
+
 def runner_tags
   return @tags unless @tags.nil?
 
@@ -45,7 +51,7 @@ def runner_tags
     abort_with_usage("Empty GitLab CI environment #{key}") if ENV[key].empty?
   end
 
-  @tags = ENV['CI_RUNNER_TAGS'].split(%r{\s*,\s*}).reject { |tag| tag == ENV['CI_RUNNER_DESCRIPTION'] }
+  @tags = ci_runner_tags.reject { |tag| tag == ENV['CI_RUNNER_DESCRIPTION'] }
 end
 
 def url
