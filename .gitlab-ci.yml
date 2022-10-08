@@ -27,6 +27,7 @@ generate:
   only:
     - pipelines
   script:
+    - declare
     - 'export PATH=/opt/puppetlabs/puppet/bin:$PATH'
     - if type -p bundle >/dev/null 2>&1 ; then
     - 'rm -f Gemfile.lock || :'
