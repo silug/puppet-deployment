@@ -11,7 +11,7 @@ default:
 
 rubocop:
   stage: syntax
-  image: ruby:3.3.3
+  image: ruby:3.3.4
   except:
     - pipelines
   script:
